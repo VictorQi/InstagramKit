@@ -127,7 +127,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 /**
- *  Search for media in a given area. The default time span is set to 5 days. 
+ *  Search for media in a given area. The default time span is set to 5 days.
  *  Can return mix of image and video types.
  *
  *  @param location Geographic Location coordinates.
@@ -174,7 +174,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  Search for a location by geographic coordinate.
  *
- *  @param location Geographic Location coordinates.
+ *  @param loction Geographic Location coordinates.
  *  @param success  Provides an array of Location objects.
  *  @param failure  Provides an error and a server status code.
  */
@@ -186,8 +186,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  Search for a location by geographic coordinate.
  *
- *  @param location         Geographic Location coordinates.
- *  @param distanceInMeters Default is 1000, max distance is 5000.
+ *  @param loction          Geographic Location coordinates.
+ *  @param distance         Default is 1000, max distance is 5000.
  *  @param success          Provides an array of Location objects.
  *  @param failure          Provides an error and a server status code.
  */
@@ -314,7 +314,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 /**
- *  See the list of media liked by the authenticated user. 
+ *  See the list of media liked by the authenticated user.
  *  Private media is returned as long as the authenticated user has permission to view that media.
  *  Liked media lists are only available for the currently authenticated user.
  *
@@ -389,7 +389,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  Get a list of recently tagged media.
  *
- *  @param tag      Name of a Tag object.
+ *  @param name      Name of a Tag object.
  *  @param success  Provides an array of Media objects and Pagination info.
  *  @param failure  Provides an error and a server status code.
  */
@@ -484,7 +484,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 /**
- *  Remove a comment either on the authenticated user's media object 
+ *  Remove a comment either on the authenticated user's media object
  *  or authored by the authenticated user.
  *
  *  REQUIREMENTS : InstagramKitLoginScopeComments during authentication.
@@ -568,7 +568,6 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  Get the list of users this self follows.
  *
- *  @param userId   Id of the User object.
  *  @param success  Provides an array of User objects and Pagination info.
  *  @param failure  Provides an error and a server status code.
  */
@@ -579,7 +578,6 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  Get the list of users this self is followed by.
  *
- *  @param userId   Id of the User object.
  *  @param success  Provides an array of User objects and Pagination info.
  *  @param failure  Provides an error and a server status code.
  */
@@ -701,8 +699,8 @@ NS_ASSUME_NONNULL_BEGIN
  *  @param failure  Provides an error and a server status code.
  */
 - (void)ignoreUser:(NSString *)userId
-     withSuccess:(InstagramResponseBlock)success
-         failure:(nullable InstagramFailureBlock)failure;
+       withSuccess:(InstagramResponseBlock)success
+           failure:(nullable InstagramFailureBlock)failure;
 
 
 #pragma mark - Common Pagination Request -
