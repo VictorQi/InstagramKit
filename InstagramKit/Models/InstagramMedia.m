@@ -192,9 +192,10 @@
         self.createdDate = [decoder decodeObjectOfClass:[NSDate class] forKey:kCreatedDate];
         self.link = [decoder decodeObjectOfClass:[NSString class] forKey:kLink];
         self.caption = [decoder decodeObjectOfClass:[NSString class] forKey:kCaption];
-        self.mLikes = [[decoder decodeObjectOfClass:[NSArray class] forKey:kLikes] mutableCopy];
-        self.mComments = [[decoder decodeObjectOfClass:[NSArray class] forKey:kComments] mutableCopy];
-        self.mUsersInPhoto = [[decoder decodeObjectOfClass:[NSArray class] forKey:kUsersInPhoto] mutableCopy];
+        self.mLikes = [NSMutableArray arrayWithArray:[decoder decodeObjectOfClass:[NSArray class] forKey:kLikes]];
+        self.likesCount = [decoder decodeIntegerForKey:kLikesCount];
+        self.mComments = [NSMutableArray arrayWithArray:[decoder decodeObjectOfClass:[NSArray class] forKey:kComments]];
+        self.mUsersInPhoto = [NSMutableArray arrayWithArray:[decoder decodeObjectOfClass:[NSArray class] forKey:kUsersInPhoto]];
         self.tags = [decoder decodeObjectOfClass:[NSArray class] forKey:kTags];
         
         CLLocationCoordinate2D coordinates;
@@ -237,6 +238,7 @@
     [encoder encodeObject:self.link forKey:kLink];
     [encoder encodeObject:self.caption forKey:kCaption];
     [encoder encodeObject:self.mLikes forKey:kLikes];
+    [encoder encodeInteger:self.likesCount forKey:kLikesCount];
     [encoder encodeObject:self.mComments forKey:kComments];
     [encoder encodeObject:self.mUsersInPhoto forKey:kUsersInPhoto];
     [encoder encodeObject:self.tags forKey:kTags];

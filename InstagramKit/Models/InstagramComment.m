@@ -35,9 +35,9 @@
 {
     self = [super initWithInfo:info];
     if (self && IKNotNull(info)) {
-        self.user = [[InstagramUser alloc] initWithInfo:info[kCreator]];
-        self.text = [[NSString alloc] initWithString:info[kText]];
-        self.createdDate = [[NSDate alloc] initWithTimeIntervalSince1970:[info[kCreatedDate] doubleValue]];
+        _user = [[InstagramUser alloc] initWithInfo:info[kCreator]];
+        _text = [[NSString alloc] initWithString:info[kText]];
+        _createdDate = [[NSDate alloc] initWithTimeIntervalSince1970:[info[kCreatedDate] doubleValue]];
     }
     return self;
 }

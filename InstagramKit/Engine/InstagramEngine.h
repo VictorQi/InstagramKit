@@ -113,14 +113,14 @@ NS_ASSUME_NONNULL_BEGIN
          failure:(nullable InstagramFailureBlock)failure;
 
 
-/**
- *  Get a list of currently popular media.
- *
- *  @param success  Provides an array of Media objects and Pagination info.
- *  @param failure  Provides an error and a server status code.
- */
-- (void)getPopularMediaWithSuccess:(InstagramMediaBlock)success
-                           failure:(nullable InstagramFailureBlock)failure;
+///**
+// *  Get a list of currently popular media.
+// *
+// *  @param success  Provides an array of Media objects and Pagination info.
+// *  @param failure  Provides an error and a server status code.
+// */
+//- (void)getPopularMediaWithSuccess:(InstagramMediaBlock)success
+//                           failure:(nullable InstagramFailureBlock)failure;
 
 
 #pragma mark -
@@ -283,34 +283,34 @@ NS_ASSUME_NONNULL_BEGIN
                               failure:(nullable InstagramFailureBlock)failure;
 
 
-#pragma mark -
+//#pragma mark - Self Feed
+//
+//
+///**
+// *  Get the authenticated user's feed.
+// *
+// *  @param success  Provides an array of Media objects and Pagination info.
+// *  @param failure  Provides an error and a server status code.
+// */
+//- (void)getSelfFeedWithSuccess:(InstagramMediaBlock)success
+//                       failure:(nullable InstagramFailureBlock)failure;
+//
+//
+///**
+// *  Get the authenticated user's feed.
+// *
+// *  @param count    Count of objects to fetch.
+// *  @param maxId    The nextMaxId from the previously obtained PaginationInfo object.
+// *  @param success  Provides an array of Media objects and Pagination info.
+// *  @param failure  Provides an error and a server status code.
+// */
+//- (void)getSelfFeedWithCount:(NSInteger)count
+//                       maxId:(nullable NSString *)maxId
+//                     success:(InstagramMediaBlock)success
+//                     failure:(nullable InstagramFailureBlock)failure;
 
 
-/**
- *  Get the authenticated user's feed.
- *
- *  @param success  Provides an array of Media objects and Pagination info.
- *  @param failure  Provides an error and a server status code.
- */
-- (void)getSelfFeedWithSuccess:(InstagramMediaBlock)success
-                       failure:(nullable InstagramFailureBlock)failure;
-
-
-/**
- *  Get the authenticated user's feed.
- *
- *  @param count    Count of objects to fetch.
- *  @param maxId    The nextMaxId from the previously obtained PaginationInfo object.
- *  @param success  Provides an array of Media objects and Pagination info.
- *  @param failure  Provides an error and a server status code.
- */
-- (void)getSelfFeedWithCount:(NSInteger)count
-                       maxId:(nullable NSString *)maxId
-                     success:(InstagramMediaBlock)success
-                     failure:(nullable InstagramFailureBlock)failure;
-
-
-#pragma mark -
+#pragma mark - Self Linked
 
 
 /**
@@ -341,7 +341,7 @@ NS_ASSUME_NONNULL_BEGIN
                              failure:(nullable InstagramFailureBlock)failure;
 
 
-#pragma mark -
+#pragma mark - Self Recent Media
 
 
 /**
@@ -566,26 +566,24 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 /**
- *  Get the list of users this user follows.
+ *  Get the list of users this self follows.
  *
  *  @param userId   Id of the User object.
  *  @param success  Provides an array of User objects and Pagination info.
  *  @param failure  Provides an error and a server status code.
  */
-- (void)getUsersFollowedByUser:(NSString *)userId
-                   withSuccess:(InstagramUsersBlock)success
+- (void)getUsersFollowedBySelf:(InstagramUsersBlock)success
                        failure:(nullable InstagramFailureBlock)failure;
 
 
 /**
- *  Get the list of users this user is followed by.
+ *  Get the list of users this self is followed by.
  *
  *  @param userId   Id of the User object.
  *  @param success  Provides an array of User objects and Pagination info.
  *  @param failure  Provides an error and a server status code.
  */
-- (void)getFollowersOfUser:(NSString *)userId
-               withSuccess:(InstagramUsersBlock)success
+- (void)getFollowersOfSelf:(InstagramUsersBlock)success
                    failure:(nullable InstagramFailureBlock)failure;
 
 

@@ -28,7 +28,7 @@
 #import "InstagramLocation.h"
 
 #if INSTAGRAMKIT_UICKEYCHAINSTORE
-#import "UICKeyChainStore.h"
+    #import "UICKeyChainStore.h"
 #endif
 
 @interface InstagramEngine()
@@ -65,28 +65,26 @@
     if (self = [super init])
     {
         NSURL *baseURL = [NSURL URLWithString:kInstagramKitBaseURL];
-        self.httpManager = [[AFHTTPSessionManager alloc] initWithBaseURL:baseURL];
-        self.httpManager.responseSerializer = [[AFJSONResponseSerializer alloc] init];
+        _httpManager = [[AFHTTPSessionManager alloc] initWithBaseURL:baseURL];
+        _httpManager.responseSerializer = [[AFJSONResponseSerializer alloc] init];
 
         NSDictionary *info = [[NSBundle mainBundle] infoDictionary];
         if (INSTAGRAMKIT_TEST_TARGET) {
             info = [[NSBundle bundleForClass:[self class]] infoDictionary];
         }
         
-        self.appClientID = info[kInstagramAppClientIdConfigurationKey];
-        self.appRedirectURL = info[kInstagramAppRedirectURLConfigurationKey];
+        _appClientID = info[kInstagramAppClientIdConfigurationKey];
+        _appRedirectURL = info[kInstagramAppRedirectURLConfigurationKey];
         
-        if (!self.appClientID || [self.appClientID isEqualToString:@""]) {
-            NSLog(@"[InstagramKit] ERROR : Invalid Client ID. Please set a valid value for the key \"%@\" in the App's Info.plist file",kInstagramAppClientIdConfigurationKey);
-        }
+        NSAssert((_appClientID && ![_appClientID isEqualToString:@""]), @"[InstagramKit] ERROR : Invalid Redirect URL. Please set a valid value for the key \"%@\" in the App's Info.plist file",kInstagramAppRedirectURLConfigurationKey);
         
-        if (!self.appRedirectURL || [self.appRedirectURL isEqualToString:@""]) {
-            NSLog(@"[InstagramKit] ERROR : Invalid Redirect URL. Please set a valid value for the key \"%@\" in the App's Info.plist file",kInstagramAppRedirectURLConfigurationKey);
-        }
+        NSAssert((_appRedirectURL && ![_appRedirectURL isEqualToString:@""]), @"[InstagramKit] ERROR : Invalid Redirect URL. Please set a valid value for the key \"%@\" in the App's Info.plist file",kInstagramAppRedirectURLConfigurationKey);
         
 #if INSTAGRAMKIT_UICKEYCHAINSTORE
-        self.keychainStore = [UICKeyChainStore keyChainStoreWithService:InstagramKitKeychainStore];
-        self.accessToken = self.keychainStore[kKeychainTokenKey];
+        _keychainStore = [UICKeyChainStore keyChainStoreWithService:InstagramKitKeychainStore];
+        if (_keychainStore[kKeychainTokenKey] != nil) {
+            _accessToken = _keychainStore[kKeychainTokenKey];
+        }
 #endif
     }
     return self;
@@ -101,7 +99,7 @@
     _accessToken = accessToken;
     
 #if INSTAGRAMKIT_UICKEYCHAINSTORE
-    self.keychainStore[kKeychainTokenKey] = self.accessToken;
+    self.keychainStore[kKeychainTokenKey] = accessToken;
 #endif
     
     [[NSNotificationCenter defaultCenter] postNotificationName:InstagramKitUserAuthenticationChangedNotification object:nil];
@@ -160,7 +158,7 @@
     if (success) {
         self.accessToken = token;
     }
-    else {
+    else if (error) {
         NSString *localizedDescription = NSLocalizedString(@"Authorization not granted.", @"Error notification to indicate Instagram OAuth token was not provided.");
         *error = [NSError errorWithDomain:InstagramKitErrorDomain
                                      code:InstagramKitAuthenticationFailedError
@@ -285,7 +283,10 @@
                       success(modelObject);
                   }
                   failure:^(NSURLSessionDataTask *task, NSError *error) {
-                      (failure)? failure(error, ((NSHTTPURLResponse *)[task response]).statusCode) : 0;
+                      NSData *errorData = error.userInfo[AFNetworkingOperationFailingURLResponseDataErrorKey];
+                      NSDictionary *serializedResponseData = [NSJSONSerialization JSONObjectWithData: errorData options:kNilOptions error:nil];
+                      
+                      (failure) ? failure(error,((NSHTTPURLResponse*)[task response]).statusCode, serializedResponseData) : 0;
                   }];
 }
 
@@ -321,7 +322,10 @@
                       });
                   }
                   failure:^(NSURLSessionDataTask *task, NSError *error) {
-                      (failure)? failure(error, ((NSHTTPURLResponse *)[task response]).statusCode) : 0;
+                      NSData *errorData = error.userInfo[AFNetworkingOperationFailingURLResponseDataErrorKey];
+                      NSDictionary *serializedResponseData = [NSJSONSerialization JSONObjectWithData: errorData options:kNilOptions error:nil];
+                      
+                      (failure)? failure(error, ((NSHTTPURLResponse *)[task response]).statusCode, serializedResponseData) : 0;
                   }];
 }
 
@@ -339,7 +343,10 @@
                        (success)? success((NSDictionary *)responseObject) : 0;
                    }
                    failure:^(NSURLSessionDataTask *task, NSError *error) {
-                       (failure) ? failure(error,((NSHTTPURLResponse*)[task response]).statusCode) : 0;
+                       NSData *errorData = error.userInfo[AFNetworkingOperationFailingURLResponseDataErrorKey];
+                       NSDictionary *serializedResponseData = [NSJSONSerialization JSONObjectWithData: errorData options:kNilOptions error:nil];
+                       
+                       (failure) ? failure(error,((NSHTTPURLResponse*)[task response]).statusCode, serializedResponseData) : 0;
                    }];
 }
 
@@ -356,7 +363,10 @@
                          (success)? success((NSDictionary *)responseObject) : 0;
                      }
                      failure:^(NSURLSessionDataTask *task, NSError *error) {
-                         (failure) ? failure(error,((NSHTTPURLResponse*)[task response]).statusCode) : 0;
+                         NSData *errorData = error.userInfo[AFNetworkingOperationFailingURLResponseDataErrorKey];
+                         NSDictionary *serializedResponseData = [NSJSONSerialization JSONObjectWithData: errorData options:kNilOptions error:nil];
+                         
+                         (failure) ? failure(error,((NSHTTPURLResponse*)[task response]).statusCode, serializedResponseData) : 0;
                      }];
 }
 
@@ -376,15 +386,15 @@
 }
 
 
-- (void)getPopularMediaWithSuccess:(InstagramMediaBlock)success
-                           failure:(InstagramFailureBlock)failure
-{
-    [self getPaginatedPath:@"media/popular"
-                parameters:nil
-             responseModel:[InstagramMedia class]
-                   success:success
-                   failure:failure];
-}
+//- (void)getPopularMediaWithSuccess:(InstagramMediaBlock)success
+//                           failure:(InstagramFailureBlock)failure
+//{
+//    [self getPaginatedPath:@"media/popular"
+//                parameters:nil
+//             responseModel:[InstagramMedia class]
+//                   success:success
+//                   failure:failure];
+//}
 
 
 - (void)getMediaAtLocation:(CLLocationCoordinate2D)location
@@ -538,28 +548,28 @@
 }
 
 
-- (void)getSelfFeedWithSuccess:(InstagramMediaBlock)success
-                       failure:(InstagramFailureBlock)failure
-{
-    [self getSelfFeedWithCount:0
-                         maxId:nil
-                       success:success
-                       failure:failure];
-}
-
-
-- (void)getSelfFeedWithCount:(NSInteger)count
-                       maxId:(NSString *)maxId
-                     success:(InstagramMediaBlock)success
-                     failure:(InstagramFailureBlock)failure
-{
-    NSDictionary *params = [self parametersFromCount:count maxId:maxId andPaginationKey:kPaginationKeyMaxId];
-    [self getPaginatedPath:[NSString stringWithFormat:@"users/self/feed"]
-                parameters:params
-             responseModel:[InstagramMedia class]
-                   success:success
-                   failure:failure];
-}
+//- (void)getSelfFeedWithSuccess:(InstagramMediaBlock)success
+//                       failure:(InstagramFailureBlock)failure
+//{
+//    [self getSelfFeedWithCount:0
+//                         maxId:nil
+//                       success:success
+//                       failure:failure];
+//}
+//
+//
+//- (void)getSelfFeedWithCount:(NSInteger)count
+//                       maxId:(NSString *)maxId
+//                     success:(InstagramMediaBlock)success
+//                     failure:(InstagramFailureBlock)failure
+//{
+//    NSDictionary *params = [self parametersFromCount:count maxId:maxId andPaginationKey:kPaginationKeyMaxId];
+//    [self getPaginatedPath:[NSString stringWithFormat:@"users/self/feed"]
+//                parameters:params
+//             responseModel:[InstagramMedia class]
+//                   success:success
+//                   failure:failure];
+//}
 
 
 - (void)getMediaLikedBySelfWithSuccess:(InstagramMediaBlock)success
@@ -773,11 +783,10 @@
 }
 
 
-- (void)getUsersFollowedByUser:(NSString *)userId
-                   withSuccess:(InstagramUsersBlock)success
+- (void)getUsersFollowedBySelf:(InstagramUsersBlock)success
                        failure:(InstagramFailureBlock)failure
 {
-    [self getPaginatedPath:[NSString stringWithFormat:@"users/%@/follows",userId]
+    [self getPaginatedPath:@"users/self/follows"
                 parameters:nil
              responseModel:[InstagramUser class]
                    success:success
@@ -785,11 +794,10 @@
 }
 
 
-- (void)getFollowersOfUser:(NSString *)userId
-               withSuccess:(InstagramUsersBlock)success
+- (void)getFollowersOfSelf:(InstagramUsersBlock)success
                    failure:(InstagramFailureBlock)failure
 {
-    [self getPaginatedPath:[NSString stringWithFormat:@"users/%@/followed-by",userId]
+    [self getPaginatedPath:@"users/self/followed-by"
                 parameters:nil
              responseModel:[InstagramUser class]
                    success:success
@@ -800,7 +808,7 @@
 - (void)getFollowRequestsWithSuccess:(InstagramUsersBlock)success
                              failure:(InstagramFailureBlock)failure
 {
-    [self getPaginatedPath:[NSString stringWithFormat:@"users/self/requested-by"]
+    [self getPaginatedPath:@"users/self/requested-by"
                 parameters:nil
              responseModel:[InstagramUser class]
                    success:success
